@@ -1,0 +1,23 @@
+{
+  "name": "refocus",
+  "version": "1.0.0",
+  "description": "ReFocus backend",
+  "license": "ISC",
+  "author": "",
+  "type": "commonjs",
+  "main": "index.js",
+  "scripts": {
+    "dev": "nodemon index.js",
+    "test": "jest"
+  },
+  "devDependencies": {
+    "jest": "^30.2.0",
+    "nodemon": "^3.1.14"
+  },
+  "dependencies": {
+    "dotenv": "^17.3.1",
+    "express": "^5.2.1",
+    "mysql2": "^3.18.2",
+    "sequelize": "^6.37.7"
+  }
+}
