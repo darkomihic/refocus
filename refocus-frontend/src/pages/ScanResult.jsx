@@ -1,13 +1,38 @@
-import React from "react";
-// import logo from "../assets/TextLogoNoBG.png";
+import { useEffect, useState } from "react";
+import { useParams } from "react-router-dom";
 
 export default function ScanResult() {
-  // Placeholder data — replace with actual data from your logic
-  const owner = {
-    name: "Petar Petrović",
-    phone: "06944221734",
-    email: "petrovic@gmail.com",
-  };
+  const { uuid } = useParams();
+  const [owner, setOwner] = useState(null);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    fetch("http://localhost:3000/keychains/scan", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ qrCode: uuid }),
+    })
+      .then((res) => {
+        if (!res.ok) throw new Error("QR kod nije pronađen");
+        return res.json();
+      })
+      .then((data) => setOwner(data))
+      .catch((err) => setError(err.message));
+  }, [uuid]);
+
+  if (error)
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <p className="text-red-600 font-semibold">{error}</p>
+      </div>
+    );
+
+  if (!owner)
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <p className="text-[#06402B]">Učitavanje...</p>
+      </div>
+    );
 
   return (
     <div className="min-h-dvh bg-white flex flex-col items-center px-4 py-8 md:py-16">
@@ -54,7 +79,7 @@ export default function ScanResult() {
             Ime:
           </p>
           <p className="text-[#06402B] text-lg md:text-xl font-bold">
-            {owner.name}
+            {owner.username}
           </p>
         </div>
 
@@ -66,12 +91,12 @@ export default function ScanResult() {
           Kontakt:
         </p>
         <p className="text-[#06402B] text-base md:text-lg font-bold mb-5">
-          {owner.name}
+          {owner.username}
         </p>
 
         {/* Phone */}
         <a
-          href={`tel:${owner.phone}`}
+          href={`tel:${owner.userphone}`}
           className="flex items-center gap-4 bg-white/50 hover:bg-white/70 transition-colors rounded-2xl px-5 py-4 mb-3"
         >
           <div className="w-10 h-10 rounded-full bg-[#06402B] flex items-center justify-center flex-shrink-0">
@@ -91,13 +116,13 @@ export default function ScanResult() {
             </svg>
           </div>
           <span className="text-[#06402B] text-base md:text-lg font-medium">
-            {owner.phone}
+            {owner.userphone}
           </span>
         </a>
 
         {/* Email */}
         <a
-          href={`mailto:${owner.email}`}
+          href={`mailto:${owner.useremail}`}
           className="flex items-center gap-4 bg-white/50 hover:bg-white/70 transition-colors rounded-2xl px-5 py-4"
         >
           <div className="w-10 h-10 rounded-full bg-[#06402B] flex items-center justify-center flex-shrink-0">
@@ -117,7 +142,7 @@ export default function ScanResult() {
             </svg>
           </div>
           <span className="text-[#06402B] text-base md:text-lg font-medium">
-            {owner.email}
+            {owner.useremail}
           </span>
         </a>
       </div>

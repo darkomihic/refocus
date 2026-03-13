@@ -1,10 +1,18 @@
 import { useState, useEffect, useRef } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 
 export default function Navbar() {
   const [open, setOpen] = useState(false);
   const menuRef = useRef(null);
   const location = useLocation();
+  const navigate = useNavigate();
+  const { isLoggedIn, logout } = useAuth();
+
+  const handleLogout = () => {
+    logout();
+    navigate("/");
+  };
 
   // Close menu on route change
   useEffect(() => {
@@ -38,19 +46,30 @@ export default function Navbar() {
       {/* Dropdown */}
       {open && (
         <div className="absolute right-4 top-16 bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden min-w-40">
-          <Link
-            to="/login"
-            className="block px-5 py-3.5 text-sm font-semibold text-[#06402B] hover:bg-[#d1fae5] transition-colors"
-          >
-            Prijavi se
-          </Link>
-          <div className="border-t border-gray-100" />
-          <Link
-            to="/register"
-            className="block px-5 py-3.5 text-sm font-semibold text-[#06402B] hover:bg-[#d1fae5] transition-colors"
-          >
-            Registruj se
-          </Link>
+          {isLoggedIn ? (
+            <button
+              onClick={handleLogout}
+              className="block w-full text-left px-5 py-3.5 text-sm font-semibold text-[#06402B] hover:bg-[#d1fae5] transition-colors"
+            >
+              Odjavi se
+            </button>
+          ) : (
+            <>
+              <Link
+                to="/login"
+                className="block px-5 py-3.5 text-sm font-semibold text-[#06402B] hover:bg-[#d1fae5] transition-colors"
+              >
+                Prijavi se
+              </Link>
+              <div className="border-t border-gray-100" />
+              <Link
+                to="/register"
+                className="block px-5 py-3.5 text-sm font-semibold text-[#06402B] hover:bg-[#d1fae5] transition-colors"
+              >
+                Registruj se
+              </Link>
+            </>
+          )}
         </div>
       )}
     </nav>

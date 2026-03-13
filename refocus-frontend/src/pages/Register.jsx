@@ -1,8 +1,34 @@
-import React from "react";
-import { Link } from "react-router-dom";
+import { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 // import logo from "../assets/TextLogoNoBG.png";
 
 export default function Register() {
+  const [username, setUsername] = useState("");
+  const [useremail, setUseremail] = useState("");
+  const [userphone, setUserphone] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirm, setConfirm] = useState("");
+  const [error, setError] = useState(null);
+  const navigate = useNavigate();
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError(null);
+    if (password !== confirm) return setError("Lozinke se ne poklapaju");
+    try {
+      const res = await fetch("http://localhost:3000/auth/register", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ username, useremail, userphone, userpassword: password }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.message || "Greška pri registraciji");
+      navigate("/login");
+    } catch (err) {
+      setError(err.message);
+    }
+  };
+
   return (
     <div className="min-h-dvh bg-white flex flex-col items-center px-4 py-8 md:py-16">
       {/* Logo */}
@@ -15,15 +41,18 @@ export default function Register() {
       </div>
 
       {/* Register Card */}
-      <div className="w-full max-w-md md:max-w-lg rounded-3xl bg-[#d1fae5] px-6 py-8 md:px-10 md:py-10">
+      <form
+        onSubmit={handleSubmit}
+        className="w-full max-w-md md:max-w-lg rounded-3xl bg-[#d1fae5] px-6 py-8 md:px-10 md:py-10"
+      >
         <h1 className="text-[#06402B] text-2xl md:text-3xl font-bold text-center mb-8">
           Registruj se
         </h1>
 
-        {/* Full Name Field */}
+        {/* Username Field */}
         <div className="mb-4">
           <div className="flex items-center gap-4 bg-white/60 rounded-2xl px-5 py-4">
-            <div className="w-10 h-10 rounded-full bg-[#06402B] flex items-center justify-center flex-shrink-0">
+            <div className="w-10 h-10 rounded-full bg-[#06402B] flex items-center justify-center shrink-0">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 className="w-5 h-5 text-white"
@@ -41,7 +70,10 @@ export default function Register() {
             </div>
             <input
               type="text"
-              placeholder="Ime i prezime"
+              placeholder="Korisničko ime"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              required
               className="flex-1 bg-transparent text-[#06402B] text-base md:text-lg font-medium placeholder-[#06402B]/40 outline-none"
             />
           </div>
@@ -50,7 +82,7 @@ export default function Register() {
         {/* Email Field */}
         <div className="mb-4">
           <div className="flex items-center gap-4 bg-white/60 rounded-2xl px-5 py-4">
-            <div className="w-10 h-10 rounded-full bg-[#06402B] flex items-center justify-center flex-shrink-0">
+            <div className="w-10 h-10 rounded-full bg-[#06402B] flex items-center justify-center shrink-0">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 className="w-5 h-5 text-white"
@@ -69,6 +101,8 @@ export default function Register() {
             <input
               type="email"
               placeholder="Email adresa"
+              value={useremail}
+              onChange={(e) => setUseremail(e.target.value)}
               className="flex-1 bg-transparent text-[#06402B] text-base md:text-lg font-medium placeholder-[#06402B]/40 outline-none"
             />
           </div>
@@ -77,7 +111,7 @@ export default function Register() {
         {/* Phone Field */}
         <div className="mb-4">
           <div className="flex items-center gap-4 bg-white/60 rounded-2xl px-5 py-4">
-            <div className="w-10 h-10 rounded-full bg-[#06402B] flex items-center justify-center flex-shrink-0">
+            <div className="w-10 h-10 rounded-full bg-[#06402B] flex items-center justify-center shrink-0">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 className="w-5 h-5 text-white"
@@ -96,6 +130,8 @@ export default function Register() {
             <input
               type="tel"
               placeholder="Broj telefona"
+              value={userphone}
+              onChange={(e) => setUserphone(e.target.value)}
               className="flex-1 bg-transparent text-[#06402B] text-base md:text-lg font-medium placeholder-[#06402B]/40 outline-none"
             />
           </div>
@@ -104,7 +140,7 @@ export default function Register() {
         {/* Password Field */}
         <div className="mb-4">
           <div className="flex items-center gap-4 bg-white/60 rounded-2xl px-5 py-4">
-            <div className="w-10 h-10 rounded-full bg-[#06402B] flex items-center justify-center flex-shrink-0">
+            <div className="w-10 h-10 rounded-full bg-[#06402B] flex items-center justify-center shrink-0">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 className="w-5 h-5 text-white"
@@ -120,6 +156,9 @@ export default function Register() {
             <input
               type="password"
               placeholder="Lozinka"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
               className="flex-1 bg-transparent text-[#06402B] text-base md:text-lg font-medium placeholder-[#06402B]/40 outline-none"
             />
           </div>
@@ -128,7 +167,7 @@ export default function Register() {
         {/* Confirm Password Field */}
         <div className="mb-8">
           <div className="flex items-center gap-4 bg-white/60 rounded-2xl px-5 py-4">
-            <div className="w-10 h-10 rounded-full bg-[#06402B] flex items-center justify-center flex-shrink-0">
+            <div className="w-10 h-10 rounded-full bg-[#06402B] flex items-center justify-center shrink-0">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
                 className="w-5 h-5 text-white"
@@ -147,46 +186,25 @@ export default function Register() {
             <input
               type="password"
               placeholder="Potvrdi lozinku"
+              value={confirm}
+              onChange={(e) => setConfirm(e.target.value)}
+              required
               className="flex-1 bg-transparent text-[#06402B] text-base md:text-lg font-medium placeholder-[#06402B]/40 outline-none"
             />
           </div>
         </div>
 
+        {error && (
+          <p className="text-red-600 text-sm text-center mb-4">{error}</p>
+        )}
+
         {/* Register Button */}
-        <button className="w-full bg-[#06402B] hover:bg-[#166534] transition-colors text-white text-lg font-bold py-4 rounded-2xl mb-6">
+        <button
+          type="submit"
+          className="w-full bg-[#06402B] hover:bg-[#166534] transition-colors text-white text-lg font-bold py-4 rounded-2xl mb-6"
+        >
           Registruj se
         </button>
-
-        {/* Divider */}
-        <div className="flex items-center gap-4 mb-6">
-          <div className="flex-1 border-t border-[#06402B]/20" />
-          <span className="text-[#06402B]/50 text-sm font-medium">ili</span>
-          <div className="flex-1 border-t border-[#06402B]/20" />
-        </div>
-
-        {/* Google Register */}
-        <button className="w-full bg-white/70 hover:bg-white transition-colors text-[#06402B] text-base font-semibold py-4 rounded-2xl flex items-center justify-center gap-3 mb-6">
-          <svg className="w-5 h-5" viewBox="0 0 24 24">
-            <path
-              fill="#4285F4"
-              d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 01-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z"
-            />
-            <path
-              fill="#34A853"
-              d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
-            />
-            <path
-              fill="#FBBC05"
-              d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"
-            />
-            <path
-              fill="#EA4335"
-              d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
-            />
-          </svg>
-          Nastavi sa Google
-        </button>
-
         {/* Login Link */}
         <p className="text-center text-[#06402B]/60 text-sm">
           Već imaš nalog?{" "}
@@ -197,7 +215,16 @@ export default function Register() {
             Prijavi se
           </Link>
         </p>
-      </div>
+      </form>
+
+      <button
+        onClick={() => navigate("/")}
+        className="w-48 mt-4 bg-[#06402B] hover:bg-[#166534] transition-colors text-white text-lg font-bold py-4 rounded-2xl mb-6"
+      >
+        Vrati se nazad
+      </button>
     </div>
+
+    
   );
 }
