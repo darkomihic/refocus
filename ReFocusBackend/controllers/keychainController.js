@@ -31,6 +31,7 @@ const check = async (req, res) => {
   try {
     const keychain = await keychainService.checkKeychainQR(req.body.qrCode);
     if (!keychain) return res.status(404).json({ message: 'QR code not found' });
+    if (keychain.userid===null) return res.status(403).json({ message: 'QR code not found' });
     res.json(keychain.User);
   } catch (err) {
     res.status(500).json({ message: 'Scan failed', error: err.message });
