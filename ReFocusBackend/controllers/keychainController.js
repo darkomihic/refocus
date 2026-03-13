@@ -1,4 +1,5 @@
 const keychainService = require('../services/keychainService');
+const jwt = require('jsonwebtoken');
 
 const getAll = async (req, res) => {
   const keychains = await keychainService.getAllKeychains();
@@ -26,4 +27,34 @@ const remove = async (req, res) => {
   res.json({ message: 'Keychain deleted' });
 };
 
-module.exports = { getAll, getById, create, update, remove };
+const check = async (req, res) => {
+  try {
+    const keychain = await keychainService.checkKeychainQR(req.body.qrCode);
+    if (!keychain) return res.status(404).json({ message: 'QR code not found' });
+    res.json(keychain.User);
+  } catch (err) {
+    res.status(500).json({ message: 'Scan failed', error: err.message });
+  }
+};
+
+const claim = async (req, res) => {
+  try {
+    const authHeader = req.headers.authorization;
+    if (!authHeader) return res.status(401).json({ message: 'Not authenticated' });
+    const token = authHeader.split(' ')[1];
+    let decoded;
+    try {
+      decoded = jwt.verify(token, process.env.JWT_SECRET);
+    } catch {
+      return res.status(401).json({ message: 'Invalid token' });
+    }
+    const result = await keychainService.claimKeychain(req.body.qrCode, decoded.userid);
+    if (result.status === 'not_found') return res.status(404).json({ message: 'QR kod nije pronađen' });
+    if (result.status === 'already_claimed') return res.status(409).json({ message: 'Privezak je već registrovan' });
+    res.json({ message: 'Privezak uspešno registrovan' });
+  } catch (err) {
+    res.status(500).json({ message: 'Greška pri registraciji', error: err.message });
+  }
+};
+
+module.exports = { getAll, getById, create, update, remove, check, claim };
