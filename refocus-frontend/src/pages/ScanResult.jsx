@@ -1,10 +1,23 @@
 import { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
+import { useNavbar } from "../context/NavbarContext";
 
 export default function ScanResult() {
   const { uuid } = useParams();
   const [owner, setOwner] = useState(null);
   const [error, setError] = useState(null);
+  const navigate = useNavigate();
+  const { setVisible } = useNavbar();
+
+  // Hide navbar until the result card is ready
+  useEffect(() => {
+    setVisible(false);
+    return () => setVisible(true);
+  }, [setVisible]);
+
+  useEffect(() => {
+    if (owner) setVisible(true);
+  }, [owner, setVisible]);
 
   useEffect(() => {
     fetch("http://localhost:3000/keychains/scan", {
@@ -13,7 +26,8 @@ export default function ScanResult() {
       body: JSON.stringify({ qrCode: uuid }),
     })
       .then((res) => {
-        if (!res.ok) throw new Error("QR kod nije pronađen");
+        if (res.status===404) throw new Error("QR kod nije pronađen u bazi");
+        if (res.status===403) throw new Error("QR kod nije registrovan");
         return res.json();
       })
       .then((data) => setOwner(data))
@@ -22,9 +36,17 @@ export default function ScanResult() {
 
   if (error)
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="min-h-screen flex flex-col items-center justify-center">
         <p className="text-red-600 font-semibold">{error}</p>
+        <button
+          onClick={() => navigate("/")}
+          className="w-48 mt-4 bg-[#06402B] hover:bg-[#166534] transition-colors text-white text-lg font-bold py-4 rounded-2xl mb-6"
+        >
+          Vrati se nazad
+      </button>
       </div>
+
+
     );
 
   if (!owner)
