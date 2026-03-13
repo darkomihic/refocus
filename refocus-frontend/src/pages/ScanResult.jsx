@@ -20,7 +20,7 @@ export default function ScanResult() {
   }, [owner, setVisible]);
 
   useEffect(() => {
-    fetch("http://localhost:3000/keychains/scan", {
+    fetch(`${import.meta.env.VITE_API_URL}/keychains/scan`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ qrCode: uuid }),

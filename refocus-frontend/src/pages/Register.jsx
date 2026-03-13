@@ -16,7 +16,7 @@ export default function Register() {
     setError(null);
     if (password !== confirm) return setError("Lozinke se ne poklapaju");
     try {
-      const res = await fetch("http://localhost:3000/auth/register", {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/auth/register`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ username, useremail, userphone, userpassword: password }),
